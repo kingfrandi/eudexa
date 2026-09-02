@@ -14,6 +14,7 @@ const rates = { USD: 1, EUR: 0.92, DOP: 59.1, GBP: 0.78, JPY: 156.4, MXN: 16.9 }
 const currencies = Object.keys(rates);
 let lang = localStorage.getItem('lang') || 'ES';
 let dark = localStorage.getItem('theme') === 'dark';
+let lastScrollY = window.scrollY;
 
 const t = (es, en) => lang === 'ES' ? es : en;
 const marketCards = (data) => data.map(([name, symbol, type, price, change]) => `
@@ -40,7 +41,7 @@ function render() {
 
   document.getElementById('root').innerHTML = `
     <div class="app">
-      <header>
+      <header id="siteHeader">
         <b class="logo">EUDEXA<span>•</span></b>
         <nav>
           <a href="#markets">${t('Mercados', 'Markets')}</a>
@@ -48,7 +49,7 @@ function render() {
           <a href="#education">${t('Educación', 'Education')}</a>
         </nav>
         <div class="tools">
-          <button id="searchToggle">⌕</button>
+          <button id="searchToggle" aria-label="Search">⌕</button>
           <button id="langToggle">${lang}</button>
           <button id="themeToggle">${dark ? '☀' : '☾'}</button>
         </div>
@@ -65,7 +66,7 @@ function render() {
         </section>
 
         <section id="searchPanel" class="search hidden">
-          <input id="searchInput" autofocus placeholder="Bitcoin, Apple, Gold, EUR/USD...">
+          <div class="searchbox"><span>⌕</span><input id="searchInput" placeholder="Bitcoin, Apple, Gold, EUR/USD..." autocomplete="off"><button id="searchClose" aria-label="Close search">×</button></div>
           <div id="searchResults"></div>
         </section>
 
@@ -136,12 +137,12 @@ function render() {
         <small>© 2026 EUDEXA</small>
       </footer>
 
-      <button class="calcb" id="calcToggle">🧮</button>
-      <div id="calculator" class="calculator hidden">
-        <div class="calcTop">Calculator <button id="calcClose">×</button></div>
+      <button class="calcb" id="calcToggle" aria-label="Open calculator">🧮</button>
+      <div id="calculator" class="calculator hidden" aria-hidden="true">
+        <div class="calcTop"><div><span class="calcLabel">EUDEXA</span><strong>${t('Calculadora', 'Calculator')}</strong></div><button id="calcClose" aria-label="Close calculator">×</button></div>
         <input id="calcDisplay" readonly placeholder="0">
         <div class="calcKeys">${['7','8','9','÷','4','5','6','×','1','2','3','−','0','.','+','='].map(k => `<button data-key="${k}">${k}</button>`).join('')}</div>
-        <button class="clear" id="calcClear">Clear</button>
+        <button class="clear" id="calcClear">${t('Limpiar', 'Clear')}</button>
       </div>
     </div>
   `;
@@ -153,7 +154,12 @@ function render() {
 function bindEvents() {
   document.getElementById('themeToggle').onclick = () => { dark = !dark; render(); };
   document.getElementById('langToggle').onclick = () => { lang = lang === 'ES' ? 'EN' : 'ES'; render(); };
-  document.getElementById('searchToggle').onclick = () => document.getElementById('searchPanel').classList.toggle('hidden');
+  document.getElementById('searchToggle').onclick = () => {
+    const panel = document.getElementById('searchPanel');
+    panel.classList.toggle('hidden');
+    if (!panel.classList.contains('hidden')) document.getElementById('searchInput').focus();
+  };
+  document.getElementById('searchClose').onclick = () => document.getElementById('searchPanel').classList.add('hidden');
   document.getElementById('searchInput').oninput = search;
 
   ['amount', 'from', 'to'].forEach(id => document.getElementById(id).addEventListener('input', updateConverter));
@@ -164,10 +170,20 @@ function bindEvents() {
     updateConverter();
   };
 
-  document.getElementById('calcToggle').onclick = () => document.getElementById('calculator').classList.toggle('hidden');
-  document.getElementById('calcClose').onclick = () => document.getElementById('calculator').classList.add('hidden');
+  const calculator = document.getElementById('calculator');
+  document.getElementById('calcToggle').onclick = () => {
+    const hidden = calculator.classList.toggle('hidden');
+    calculator.setAttribute('aria-hidden', String(hidden));
+    if (!hidden) document.getElementById('calcDisplay').focus();
+  };
+  document.getElementById('calcClose').onclick = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    calculator.classList.add('hidden');
+    calculator.setAttribute('aria-hidden', 'true');
+  };
   document.getElementById('calcClear').onclick = () => { document.getElementById('calcDisplay').value = ''; };
-  document.querySelectorAll('[data-key]').forEach(button => button.onclick = () => calculator(button.dataset.key));
+  document.querySelectorAll('[data-key]').forEach(button => button.onclick = () => calculatorKey(button.dataset.key));
 }
 
 function updateConverter() {
@@ -185,7 +201,7 @@ function search() {
   document.getElementById('searchResults').innerHTML = query ? results.map(a => `<div class="result"><b>${a[0]}</b><span>${a[2]} · ${a[1]}</span><strong>${a[3]} <i class="${a[4].startsWith('-') ? 'neg' : ''}">${a[4]}</i></strong></div>`).join('') : '';
 }
 
-function calculator(key) {
+function calculatorKey(key) {
   const display = document.getElementById('calcDisplay');
   if (key !== '=') { display.value += key; return; }
   try {
@@ -194,5 +210,21 @@ function calculator(key) {
     display.value = String(Function(`"use strict"; return (${safe})`)());
   } catch { display.value = 'Error'; }
 }
+
+window.addEventListener('scroll', () => {
+  const current = window.scrollY;
+  const header = document.getElementById('siteHeader');
+  const searchPanel = document.getElementById('searchPanel');
+  if (!header || !searchPanel) return;
+
+  if (current > lastScrollY + 6 && current > 90) {
+    header.classList.add('scroll-hide');
+    searchPanel.classList.add('scroll-hide');
+  } else if (current < lastScrollY - 6) {
+    header.classList.remove('scroll-hide');
+    searchPanel.classList.remove('scroll-hide');
+  }
+  lastScrollY = Math.max(current, 0);
+}, { passive: true });
 
 render();
