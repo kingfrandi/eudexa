@@ -14,20 +14,22 @@ function fallbackCatalog() {
   return FALLBACK.map(([name, symbol, type]) => ({ name, symbol, type }));
 }
 
-async function getCrypto() {
-  const url = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=false';
+async function getCryptoPage(page) {
+  const url = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=' + page + '&sparkline=false';
   const response = await fetch(url, { headers: { accept: 'application/json' } });
   if (!response.ok) throw new Error('CoinGecko unavailable');
   const data = await response.json();
   return data.filter(x => x?.name && x?.symbol).map(x => ({
-    name: clean(x.name),
-    symbol: clean(String(x.symbol).toUpperCase(), 30),
-    type: 'Crypto',
-    id: clean(x.id, 100),
+    name: clean(x.name), symbol: clean(String(x.symbol).toUpperCase(), 30), type: 'Crypto', id: clean(x.id, 100),
     price: Number.isFinite(x.current_price) ? x.current_price : null,
     change: Number.isFinite(x.price_change_percentage_24h) ? x.price_change_percentage_24h : null,
     marketCap: Number.isFinite(x.market_cap) ? x.market_cap : null
   }));
+}
+
+async function getCrypto() {
+  const pages = await Promise.all([1,2,3,4].map(getCryptoPage));
+  return pages.flat();
 }
 
 async function getStocks(key) {
@@ -42,9 +44,7 @@ async function getStocks(key) {
   const index = Object.fromEntries(headers.map((h, i) => [h.trim(), i]));
   return lines.slice(1).map(line => {
     const cells = line.split(',');
-    const symbol = clean(cells[index.symbol], 30);
-    const name = clean(cells[index.name], 160);
-    const assetType = clean(cells[index.assetType], 30);
+    const symbol = clean(cells[index.symbol], 30); const name = clean(cells[index.name], 160); const assetType = clean(cells[index.assetType], 30);
     if (!symbol || !name || (assetType && !['Stock','ETF'].includes(assetType))) return null;
     return { name, symbol, type: assetType === 'ETF' ? 'ETF' : 'Stock', exchange: clean(cells[index.exchange], 30) };
   }).filter(Boolean);
@@ -60,12 +60,7 @@ module.exports = async function handler(req, res) {
     if (crypto.status === 'fulfilled') assets.push(...crypto.value);
     if (stocks.status === 'fulfilled') assets.push(...stocks.value);
     const seen = new Set();
-    assets = assets.filter(asset => {
-      const key = `${asset.type}:${asset.symbol}`.toLowerCase();
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
+    assets = assets.filter(asset => { const key = `${asset.type}:${asset.symbol}`.toLowerCase(); if (seen.has(key)) return false; seen.add(key); return true; });
     if (q) assets = assets.filter(a => a.name.toLowerCase().includes(q) || a.symbol.toLowerCase().includes(q));
     return res.status(200).json({ source: { crypto: crypto.status, stocks: stocks.status }, count: assets.length, assets: assets.slice(0, q ? 30 : 1000) });
   } catch (error) {
