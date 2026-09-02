@@ -67,8 +67,10 @@ function bindLiveConverter() {
   if (!amount || !from || !to) return;
 
   const signature = `${from.options.length}|${to.options.length}|${from.value}|${to.value}`;
+  // Important: do not call updateLiveConverter here. The converter updates the DOM,
+  // and the MutationObserver watches the DOM; calling it from this branch creates an
+  // endless observer -> update -> mutation -> observer loop.
   if (signature === lastFxSignature) {
-    updateLiveConverter();
     return;
   }
   lastFxSignature = signature;
