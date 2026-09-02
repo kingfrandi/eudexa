@@ -15,14 +15,25 @@ import './news.css';
   let lang = localStorage.getItem('lang') || 'ES';
   let articles = [];
   let loading = false;
+  let lastLang = lang;
 
   const t = (es, en) => lang === 'ES' ? es : en;
-  const esc = value => String(value || '').replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
+  const esc = value => String(value || '').replace(/[&<>'\"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '\"': '&quot;' }[char]));
 
   function formatTime(value) {
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) return '';
     return new Intl.DateTimeFormat(lang === 'ES' ? 'es-DO' : 'en-US', { dateStyle: 'medium', timeStyle: 'short' }).format(date);
+  }
+
+  function addNewsNavLink() {
+    const nav = document.querySelector('#siteHeader nav');
+    if (!nav || nav.querySelector('a[href="#news"]')) return;
+    const link = document.createElement('a');
+    link.href = '#news';
+    link.dataset.newsNav = 'true';
+    link.textContent = t('Noticias', 'News');
+    nav.insertBefore(link, nav.lastElementChild || null);
   }
 
   function createSection() {
@@ -39,6 +50,10 @@ import './news.css';
   function render() {
     const section = createSection();
     if (!section) return;
+    addNewsNavLink();
+    const newsNav = document.querySelector('[data-news-nav]');
+    if (newsNav) newsNav.textContent = t('Noticias', 'News');
+
     section.innerHTML = `
       <div class="newsHeader">
         <div>
@@ -102,8 +117,17 @@ import './news.css';
     }
   }
 
+  function syncLanguage() {
+    const current = localStorage.getItem('lang') || 'ES';
+    if (current === lastLang) return;
+    lastLang = current;
+    lang = current;
+    render();
+  }
+
   function boot() {
     lang = localStorage.getItem('lang') || 'ES';
+    lastLang = lang;
     if (document.getElementById('education')) {
       render();
       loadNews();
@@ -114,12 +138,15 @@ import './news.css';
 
   const observer = new MutationObserver(() => {
     if (!document.getElementById('news') && document.getElementById('education')) boot();
+    else syncLanguage();
+    addNewsNavLink();
   });
   observer.observe(document.body, { childList: true, subtree: true });
 
   window.addEventListener('storage', event => {
     if (event.key === 'lang') {
       lang = event.newValue || 'ES';
+      lastLang = lang;
       render();
       loadNews();
     }
