@@ -159,10 +159,8 @@ ZWG|ZiG zimbabuense|Zimbabwe Gold`;
 const allCurrencies = CURRENCY_LIST.split('\n').map(row => {
   const [code, es, en] = row.split('|');
   return { code, es, en };
-});
+}).sort((a, b) => a.es.localeCompare(b.es, 'es', { sensitivity: 'base' }));
 
-// Demo rates already available in EUDEXA. Other currencies are selectable now,
-// but will show “rate unavailable” until the real-time FX API is connected.
 const demoRates = { USD: 1, EUR: 0.92, DOP: 59.1, GBP: 0.78, JPY: 156.4, MXN: 16.9 };
 
 function enhanceCurrencyConverter() {
@@ -175,7 +173,7 @@ function enhanceCurrencyConverter() {
 
   const currentFrom = from.value || 'USD';
   const currentTo = to.value || 'DOP';
-  const makeOptions = (selected) => allCurrencies.map(c => `<option value="${c.code}" ${c.code===selected?'selected':''}>${c.code} — ${c.es}</option>`).join('');
+  const makeOptions = (selected) => allCurrencies.map(c => `<option value="${c.code}" ${c.code===selected?'selected':''}>${c.es} — ${c.code}</option>`).join('');
   from.innerHTML = makeOptions(currentFrom);
   to.innerHTML = makeOptions(currentTo);
 
