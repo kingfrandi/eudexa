@@ -1,43 +1,72 @@
 const educationQA = [
-  ['¿Qué es un presupuesto?', 'Es un plan que organiza cuánto dinero recibes, cuánto gastas y cuánto puedes ahorrar durante un período determinado.'],
-  ['¿Por qué es importante ahorrar?', 'Ahorrar permite crear un fondo para emergencias, alcanzar objetivos y afrontar gastos futuros sin depender necesariamente de deuda.'],
-  ['¿Qué es un fondo de emergencia?', 'Es dinero reservado para gastos inesperados, como una reparación, una pérdida temporal de ingresos o una emergencia familiar.'],
-  ['¿Qué es la inflación?', 'Es el aumento generalizado de los precios de bienes y servicios con el tiempo. Cuando los precios suben, el dinero suele perder poder adquisitivo.'],
-  ['¿Qué significa poder adquisitivo?', 'Es la cantidad de bienes y servicios que puedes comprar con una determinada cantidad de dinero.'],
-  ['¿Qué es el interés?', 'Es el costo de utilizar dinero prestado o, en otros casos, la cantidad que puedes recibir por mantener dinero en un producto financiero que paga intereses.'],
-  ['¿Qué es el interés compuesto?', 'Es el crecimiento generado cuando los intereses obtenidos se suman al capital y posteriormente también generan intereses.'],
-  ['¿Qué es una deuda?', 'Es una obligación de devolver dinero recibido previamente, normalmente bajo unas condiciones y, en muchos casos, pagando intereses.'],
-  ['¿Qué diferencia hay entre una tarjeta de débito y una de crédito?', 'La débito utiliza fondos disponibles en tu cuenta. La crédito permite utilizar una línea de crédito que posteriormente debes pagar según las condiciones del emisor.'],
-  ['¿Qué es una tasa de interés?', 'Es el porcentaje utilizado para calcular cuánto cuesta pedir dinero prestado o cuánto rendimiento genera determinado dinero depositado o invertido.'],
-  ['¿Qué es una acción?', 'Es una participación en la propiedad de una empresa. Su precio puede subir o bajar según las condiciones del mercado y las expectativas sobre la compañía.'],
-  ['¿Qué es un bono?', 'Es un instrumento de deuda mediante el cual un emisor obtiene financiación y se compromete a devolver el principal bajo determinadas condiciones, normalmente con intereses.'],
-  ['¿Qué es una criptomoneda?', 'Es un activo digital que utiliza tecnología criptográfica y, normalmente, una red distribuida para registrar y verificar transacciones.'],
-  ['¿Qué es Bitcoin?', 'Bitcoin es un activo digital descentralizado diseñado para permitir transferencias de valor sin depender de una autoridad central que controle la red.'],
-  ['¿Qué es diversificar?', 'Es distribuir el dinero entre diferentes activos o categorías para evitar depender completamente del comportamiento de una sola inversión o fuente.'],
-  ['¿Qué es el riesgo financiero?', 'Es la posibilidad de que un resultado financiero sea diferente al esperado, incluyendo la posibilidad de perder dinero.'],
-  ['¿Qué es la liquidez?', 'Es la facilidad y rapidez con la que un activo puede convertirse en dinero sin una pérdida significativa de valor.'],
-  ['¿Qué es el patrimonio neto?', 'Es la diferencia entre lo que posees y lo que debes. En términos simples: activos menos pasivos.'],
-  ['¿Qué es un activo?', 'Es un recurso que posee una persona o empresa y que tiene un valor económico, como dinero, propiedades, inversiones o determinados bienes.'],
-  ['¿Qué es un pasivo?', 'Es una obligación financiera o deuda que una persona o empresa tiene que pagar.'],
-  ['¿Qué es el S&P 500?', 'Es un índice bursátil que sigue el comportamiento de un grupo amplio de grandes empresas estadounidenses y se utiliza como referencia del mercado de acciones de EE. UU.'],
-  ['¿Qué es el mercado de divisas?', 'Es el mercado global donde se compran y venden monedas, como el dólar estadounidense, el euro o el yen.'],
-  ['¿Qué significa USD?', 'USD es el código internacional de tres letras utilizado para identificar el dólar estadounidense.'],
-  ['¿Qué significa DOP?', 'DOP es el código internacional de tres letras utilizado para identificar el peso dominicano.'],
-  ['¿Qué es una tasa de cambio?', 'Es la relación de valor entre dos monedas. Por ejemplo, indica cuántos pesos dominicanos equivalen a una unidad de otra moneda.'],
-  ['¿Qué es una inversión?', 'Es destinar dinero o recursos a un activo o proyecto con la expectativa de obtener un resultado futuro, asumiendo que existe riesgo.'],
-  ['¿Ahorrar e invertir es lo mismo?', 'No. Ahorrar normalmente busca conservar dinero y mantenerlo disponible para objetivos o necesidades. Invertir busca obtener un rendimiento y generalmente implica asumir algún nivel de riesgo.'],
-  ['¿Qué es el costo de oportunidad?', 'Es el valor de la alternativa que dejas de elegir cuando utilizas tus recursos, como dinero o tiempo, en otra opción.'],
-  ['¿Qué es un gasto fijo?', 'Es un gasto que suele mantenerse relativamente estable de un período a otro, como ciertos alquileres o cuotas.'],
-  ['¿Qué es un gasto variable?', 'Es un gasto cuyo monto puede cambiar según el consumo o las circunstancias, como alimentación, transporte o entretenimiento.']
+  ['¿Qué es un presupuesto?', 'Es un plan financiero que organiza tus ingresos, gastos, ahorro y objetivos durante un período determinado. Un presupuesto te permite saber cuánto dinero entra, cuánto sale y en qué estás utilizando tus recursos. También ayuda a detectar gastos innecesarios, anticipar pagos y tomar decisiones con mayor control.'],
+  ['¿Por qué es importante ahorrar?', 'Ahorrar significa reservar una parte del dinero disponible para utilizarla en el futuro. El ahorro puede ayudarte a afrontar emergencias, realizar compras importantes, alcanzar metas y reducir la necesidad de recurrir a préstamos. La cantidad adecuada depende de tus ingresos, gastos, obligaciones y objetivos financieros.'],
+  ['¿Qué es un fondo de emergencia?', 'Es una reserva de dinero destinada exclusivamente a situaciones inesperadas, como una reparación importante, una emergencia familiar, una interrupción temporal de ingresos o un gasto urgente. Su objetivo principal es darte margen financiero cuando aparece un problema sin tener que depender inmediatamente de una deuda.'],
+  ['¿Qué es la inflación?', 'La inflación es un aumento general y sostenido del nivel de precios de bienes y servicios en una economía. Cuando existe inflación, una determinada cantidad de dinero puede comprar menos bienes y servicios que anteriormente. No significa que absolutamente todos los precios aumenten al mismo ritmo, ya que algunos pueden subir más, otros menos e incluso algunos pueden disminuir.'],
+  ['¿Qué significa poder adquisitivo?', 'El poder adquisitivo es la cantidad de bienes y servicios que puedes comprar con una determinada cantidad de dinero. Cuando los precios aumentan más rápido que los ingresos, el poder adquisitivo puede disminuir. Por eso la inflación es importante para las finanzas personales: afecta cuánto puedes comprar con el dinero que tienes.'],
+  ['¿Qué es el interés?', 'El interés es el costo de utilizar dinero prestado o, desde la perspectiva del ahorrador o prestamista, la compensación que puede recibir por permitir que otra persona utilice ese dinero. Puede expresarse como porcentaje y depender del monto, el plazo y las condiciones acordadas.'],
+  ['¿Qué es el interés compuesto?', 'El interés compuesto ocurre cuando los intereses generados se incorporan al capital y posteriormente también generan intereses. Con el paso del tiempo, este efecto puede hacer que el crecimiento sea mayor que cuando solo se calcula interés sobre el capital inicial. El resultado depende de factores como la tasa, el tiempo y la frecuencia de capitalización.'],
+  ['¿Qué es una deuda?', 'Una deuda es una obligación de devolver dinero que se recibió anteriormente, normalmente bajo determinadas condiciones. Puede incluir intereses, comisiones, fechas de pago y otras obligaciones. Una deuda no es necesariamente buena o mala por sí misma; es importante analizar su costo, plazo y capacidad de pago antes de asumirla.'],
+  ['¿Qué diferencia hay entre una tarjeta de débito y una de crédito?', 'La tarjeta de débito normalmente utiliza el dinero disponible en una cuenta bancaria, por lo que las compras se descuentan de esos fondos. La tarjeta de crédito utiliza una línea de crédito proporcionada por el emisor y posteriormente debes pagar lo utilizado según sus condiciones. Una tarjeta de crédito puede generar intereses si no se paga de acuerdo con las condiciones establecidas.'],
+  ['¿Qué es una tasa de interés?', 'Es el porcentaje utilizado para calcular el costo de pedir dinero prestado o el rendimiento asociado a determinados productos financieros. La tasa puede expresarse de diferentes maneras y puede ser fija o variable. Para comparar préstamos o productos financieros conviene revisar no solo el porcentaje anunciado, sino también comisiones, plazos y el costo total.'],
+  ['¿Qué es una acción?', 'Una acción representa una participación de propiedad en una empresa. Dependiendo del tipo de acción, puede otorgar derechos económicos, como participar en dividendos, y determinados derechos de voto. El precio de una acción puede cambiar constantemente debido a la oferta y la demanda, los resultados de la empresa, las expectativas y las condiciones generales del mercado.'],
+  ['¿Qué es un bono?', 'Un bono es un instrumento de deuda mediante el cual un emisor obtiene financiación de los compradores del bono. A cambio, el emisor se compromete a realizar determinados pagos y, normalmente, devolver el principal al vencimiento según las condiciones establecidas. Los bonos pueden estar emitidos por gobiernos, empresas u otras entidades.'],
+  ['¿Qué es una criptomoneda?', 'Una criptomoneda es un activo digital que utiliza técnicas criptográficas para proteger y verificar determinadas operaciones. Muchas criptomonedas funcionan mediante redes distribuidas y utilizan una blockchain u otra tecnología de registro distribuido. Cada proyecto puede tener características, objetivos, mecanismos y riesgos diferentes.'],
+  ['¿Qué es Bitcoin?', 'Bitcoin es un sistema y activo digital descentralizado diseñado para permitir transferencias de valor mediante una red informática sin depender de un banco central para validar cada operación. Las transacciones se registran en una blockchain y la red utiliza mecanismos criptográficos y de consenso. Su precio de mercado puede experimentar una volatilidad considerable, por lo que es importante diferenciar la tecnología de su precio.'],
+  ['¿Qué es diversificar?', 'Diversificar significa distribuir recursos entre diferentes activos, empresas, sectores, regiones u otras categorías en lugar de concentrarlos completamente en una sola opción. La diversificación puede reducir determinados riesgos relacionados con la concentración, aunque no elimina el riesgo de pérdidas ni garantiza un resultado determinado.'],
+  ['¿Qué es el riesgo financiero?', 'Es la posibilidad de que el resultado financiero sea diferente al esperado. Puede incluir la posibilidad de perder dinero, no alcanzar un objetivo, enfrentar cambios en las tasas de interés, sufrir problemas de liquidez o estar expuesto a variaciones de precios. El nivel y tipo de riesgo depende de la situación y del producto financiero.'],
+  ['¿Qué es la liquidez?', 'La liquidez describe qué tan fácil y rápidamente un activo puede convertirse en dinero sin provocar una pérdida significativa de valor. El efectivo suele tener una liquidez muy alta, mientras que determinados bienes o inversiones pueden requerir más tiempo para venderse. La liquidez es especialmente importante cuando necesitas disponer de dinero rápidamente.'],
+  ['¿Qué es el patrimonio neto?', 'El patrimonio neto es la diferencia entre el valor de los activos y el valor de los pasivos. En términos sencillos: patrimonio neto = lo que posees menos lo que debes. Puede utilizarse como una medida general de la situación financiera de una persona, familia o empresa en un momento determinado.'],
+  ['¿Qué es un activo?', 'Un activo es un recurso que posee una persona o empresa y que tiene valor económico. Puede incluir efectivo, cuentas bancarias, propiedades, determinados bienes, inversiones y otros recursos. Para analizar una situación financiera es importante considerar tanto los activos como las obligaciones que existen sobre ellos.'],
+  ['¿Qué es un pasivo?', 'Un pasivo es una obligación financiera que una persona o empresa debe pagar o cumplir. Entre los ejemplos se encuentran préstamos, saldos pendientes, cuentas por pagar y otras obligaciones. Los pasivos se analizan junto con los activos para conocer mejor la situación financiera y calcular el patrimonio neto.'],
+  ['¿Qué es el S&P 500?', 'El S&P 500 es un índice bursátil que sigue el desempeño de aproximadamente 500 grandes empresas que cotizan en bolsas de Estados Unidos. Se utiliza ampliamente como referencia para estudiar el comportamiento del mercado estadounidense de acciones de gran capitalización. El índice no significa que todas sus empresas suban o bajen al mismo tiempo.'],
+  ['¿Qué es el mercado de divisas?', 'El mercado de divisas, conocido como Forex, es el mercado global donde se intercambian monedas. En él se negocian pares como EUR/USD o USD/JPY. Los tipos de cambio muestran la relación de valor entre dos monedas y pueden cambiar debido a factores económicos, financieros, políticos y de mercado.'],
+  ['¿Qué significa USD?', 'USD es el código internacional de tres letras utilizado para identificar el dólar estadounidense. Es una de las monedas más utilizadas en el comercio y las finanzas internacionales. En un par como USD/DOP, USD representa el dólar estadounidense y DOP representa el peso dominicano.'],
+  ['¿Qué significa DOP?', 'DOP es el código internacional de tres letras utilizado para identificar el peso dominicano, la moneda oficial de República Dominicana. En un par como USD/DOP, el tipo de cambio expresa la relación entre el dólar estadounidense y el peso dominicano.'],
+  ['¿Qué es una tasa de cambio?', 'Una tasa de cambio es la relación de valor entre dos monedas. Por ejemplo, una cotización USD/DOP indica cuántos pesos dominicanos corresponden a una unidad de dólar estadounidense bajo la cotización utilizada. Las tasas pueden variar constantemente y el valor recibido al cambiar dinero puede incluir comisiones o márgenes del proveedor.'],
+  ['¿Qué es una inversión?', 'Invertir consiste en destinar dinero u otros recursos a un activo, proyecto o instrumento con la expectativa de obtener un resultado futuro. Ese resultado puede ser positivo o negativo. Las inversiones pueden presentar diferentes niveles de riesgo, liquidez, plazo y volatilidad, por lo que no existe un rendimiento garantizado.'],
+  ['¿Ahorrar e invertir es lo mismo?', 'No. Ahorrar normalmente significa reservar dinero buscando conservarlo y tenerlo disponible para necesidades u objetivos. Invertir implica destinar recursos a activos o proyectos con la expectativa de obtener un rendimiento y generalmente supone asumir algún nivel de riesgo. Ambos conceptos pueden formar parte de una planificación financiera, pero cumplen funciones diferentes.'],
+  ['¿Qué es el costo de oportunidad?', 'El costo de oportunidad es el valor de la alternativa que dejas de elegir al utilizar un recurso en otra opción. Por ejemplo, si utilizas dinero para una compra, ese mismo dinero ya no está disponible para ahorrar, pagar una deuda o utilizarlo en otro objetivo. El concepto ayuda a evaluar las decisiones considerando no solo su costo directo, sino también lo que se deja de obtener.'],
+  ['¿Qué es un gasto fijo?', 'Es un gasto que normalmente permanece relativamente estable durante determinados períodos, aunque puede cambiar con el tiempo. Algunos ejemplos pueden ser ciertos alquileres, cuotas o servicios contratados. Identificar los gastos fijos ayuda a conocer cuánto dinero necesitas para cubrir las obligaciones básicas antes de considerar otros gastos.'],
+  ['¿Qué es un gasto variable?', 'Es un gasto cuyo monto puede cambiar según el consumo, las circunstancias o las necesidades del período. Alimentación, transporte, entretenimiento y algunas facturas pueden variar de un mes a otro. Identificar estos gastos permite encontrar áreas donde el consumo puede ajustarse cuando sea necesario.'],
+  ['¿Qué es el presupuesto 50/30/20?', 'Es una regla orientativa de organización financiera que distribuye el ingreso en tres grupos: necesidades, deseos y ahorro o pago de deudas. Tradicionalmente se presenta como 50% para necesidades, 30% para deseos y 20% para ahorro o reducción de deuda. No es una fórmula obligatoria: los porcentajes pueden necesitar ajustes según los ingresos, costos de vida, obligaciones y objetivos de cada persona.'],
+  ['¿Qué es una tasa anual efectiva?', 'Es una forma de expresar el costo o rendimiento de una tasa considerando determinados efectos de capitalización durante un año. Puede facilitar la comparación entre productos financieros cuando las condiciones se expresan de manera comparable. Siempre conviene revisar la metodología utilizada y otros costos asociados.'],
+  ['¿Qué es una comisión bancaria?', 'Es un cargo que una entidad financiera puede cobrar por determinados servicios, operaciones o productos. Las comisiones pueden variar según la institución y el servicio, por lo que conviene revisar las condiciones antes de contratar o realizar una operación. El costo total de un producto no debe evaluarse únicamente por su tasa de interés.'],
+  ['¿Qué es la educación financiera?', 'Es el conocimiento y las habilidades necesarias para comprender y gestionar mejor el dinero. Incluye conceptos como presupuesto, ahorro, deuda, intereses, riesgo, inversión, seguros, impuestos y planificación. Una buena educación financiera ayuda a interpretar información y tomar decisiones más conscientes, aunque no elimina los riesgos financieros.']
 ];
+
+function educationQAStyles() {
+  if (document.getElementById('educationQAStyles')) return;
+  const style = document.createElement('style');
+  style.id = 'educationQAStyles';
+  style.textContent = `
+    .education-qa-block{margin-top:48px;padding-top:34px;border-top:1px solid var(--line)}
+    .education-qa-heading h3{margin:0;color:#2563eb;font-size:26px;line-height:1.2}
+    .education-qa-heading p{color:var(--muted);margin:9px 0 22px;line-height:1.6}
+    .education-qa-list{display:grid;gap:10px}
+    details.educationQA{background:var(--panel);border:1px solid var(--line);border-radius:13px;overflow:hidden;transition:border-color .2s ease,box-shadow .2s ease}
+    details.educationQA[open]{border-color:#2563eb;box-shadow:0 8px 24px rgba(37,99,235,.08)}
+    details.educationQA summary{list-style:none;cursor:pointer;padding:18px 46px 18px 19px;position:relative;color:#2563eb;font-weight:750;font-size:16px;line-height:1.45}
+    details.educationQA summary::-webkit-details-marker{display:none}
+    details.educationQA summary::after{content:'+';position:absolute;right:18px;top:50%;transform:translateY(-50%);font-size:23px;font-weight:400;color:#2563eb}
+    details.educationQA[open] summary::after{content:'−'}
+    details.educationQA p{margin:0;padding:0 19px 20px;color:var(--text);font-size:15px;line-height:1.75}
+    [data-theme=dark] details.educationQA summary{color:#8db4ff}
+    [data-theme=dark] details.educationQA[open]{border-color:#8db4ff}
+    [data-theme=dark] details.educationQA summary::after{color:#8db4ff}
+    @media(max-width:600px){.education-qa-heading h3{font-size:23px}.educationQA summary{font-size:15px;padding:16px 42px 16px 16px}.educationQA p{padding:0 16px 18px;font-size:14px}}
+  `;
+  document.head.appendChild(style);
+}
 
 function renderEducationQA() {
   const section = document.getElementById('education');
   if (!section || section.dataset.qaReady === '1') return;
   section.dataset.qaReady = '1';
+  educationQAStyles();
   const lang = localStorage.getItem('lang') || 'ES';
   const title = lang === 'ES' ? 'Preguntas y respuestas financieras' : 'Financial questions and answers';
-  const intro = lang === 'ES' ? 'Aprende conceptos financieros de forma sencilla, rápida y práctica.' : 'Learn financial concepts in a simple, quick and practical way.';
+  const intro = lang === 'ES' ? 'Aprende conceptos financieros de forma sencilla, práctica y con explicaciones más completas.' : 'Learn financial concepts with simple, practical, and more detailed explanations.';
   const items = educationQA.map(([question, answer], index) => `<details class="educationQA"><summary>${index + 1}. ${question}</summary><p>${answer}</p></details>`).join('');
   const block = document.createElement('div');
   block.className = 'education-qa-block';
