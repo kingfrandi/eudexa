@@ -34,11 +34,11 @@ function App() {
     localStorage.setItem('lang', lang);
   }, [lang]);
 
-  const result = (Number(amount) || 0) / rates[from] * rates[to];
-  const filtered = useMemo(
-    () => assets.filter((asset) => asset.join(' ').toLowerCase().includes(query.toLowerCase())),
-    [query]
-  );
+  const result = ((Number(amount) || 0) / rates[from]) * rates[to];
+  const filtered = useMemo(() => {
+    const text = query.toLowerCase();
+    return assets.filter((asset) => asset.join(' ').toLowerCase().includes(text));
+  }, [query]);
 
   const swapCurrencies = () => {
     setFrom(to);
@@ -52,7 +52,10 @@ function App() {
     }
 
     try {
-      const safe = expression.replaceAll('×', '*').replaceAll('÷', '/').replaceAll('−', '-');
+      const safe = expression
+        .replaceAll('×', '*')
+        .replaceAll('÷', '/')
+        .replaceAll('−', '-');
       if (!/^[0-9+\-*/.() ]+$/.test(safe)) throw new Error('Invalid expression');
       setExpression(String(Function(`"use strict"; return (${safe})`)()));
     } catch {
@@ -61,7 +64,7 @@ function App() {
   };
 
   return (
-    <>
+    <div className="app">
       <header>
         <b className="logo">EUDEXA<span>•</span></b>
         <nav>
@@ -178,7 +181,7 @@ function App() {
           <button className="clear" onClick={() => setExpression('')}>Clear</button>
         </div>
       )}
-    </>
+    </div>
   );
 }
 
