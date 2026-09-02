@@ -15,6 +15,7 @@ import './news.css';
   let lang = localStorage.getItem('lang') || 'ES';
   let articles = [];
   let loading = false;
+  let warning = '';
   let lastLang = lang;
 
   const t = (es, en) => lang === 'ES' ? es : en;
@@ -47,6 +48,10 @@ import './news.css';
     return section;
   }
 
+  function adSlot(position) {
+    return `<div class="newsAdSlot" data-ad-position="${position}" aria-label="Advertisement"><span>${t('Espacio publicitario', 'Advertising space')}</span></div>`;
+  }
+
   function render() {
     const section = createSection();
     if (!section) return;
@@ -59,10 +64,11 @@ import './news.css';
         <div>
           <p class="eyebrow">${t('ACTUALIDAD FINANCIERA', 'FINANCIAL NEWS')}</p>
           <h2>${t('Noticias financieras', 'Financial news')}</h2>
-          <p class="newsIntro">${t('Una selección de noticias de mercados, economía, bolsa, cripto y divisas. Información neutral y con enlace a la fuente original.', 'A selection of market, economy, stocks, crypto and forex news. Neutral information with a link to the original source.')}</p>
+          <p class="newsIntro">${t('Noticias financieras reales, con su título, fuente, imagen y enlace directo a la publicación original.', 'Real financial news with its title, source, image and direct link to the original publication.')}</p>
         </div>
         <button class="newsRefresh" id="newsRefresh" type="button">↻ ${t('Actualizar', 'Refresh')}</button>
       </div>
+      ${adSlot('top')}
       <div class="newsTabs" role="tablist">${categories.map(([key, es, en]) => `<button class="newsTab ${activeTopic === key ? 'active' : ''}" data-topic="${key}" type="button">${t(es, en)}</button>`).join('')}</div>
       <div id="newsGrid" class="newsGrid" aria-live="polite"></div>
     `;
@@ -82,26 +88,33 @@ import './news.css';
     const grid = document.getElementById('newsGrid');
     if (!grid) return;
     if (loading) {
-      grid.innerHTML = Array.from({ length: 6 }, () => '<article class="newsCard skeleton"><div class="skLine wide"></div><div class="skLine"></div><div class="skLine short"></div><div class="skBottom"></div></article>').join('');
+      grid.innerHTML = Array.from({ length: 6 }, () => '<article class="newsCard skeleton"><div class="skImage"></div><div class="skLine wide"></div><div class="skLine"></div><div class="skLine short"></div><div class="skBottom"></div></article>').join('');
       return;
     }
     if (!articles.length) {
-      grid.innerHTML = `<div class="newsEmpty">${t('No hay noticias disponibles en este momento.', 'No news is available right now.')}</div>`;
+      grid.innerHTML = `<div class="newsEmpty">${esc(warning || t('No hay noticias disponibles en este momento.', 'No news is available right now.'))}</div>`;
       return;
     }
+
     grid.innerHTML = articles.map((article, index) => `
+      ${index === 4 ? adSlot('middle') : ''}
       <article class="newsCard ${index === 0 ? 'featured' : ''}">
-        <div class="newsCardTop"><span class="newsBadge">${esc(article.source)}</span><time datetime="${esc(article.time)}">${esc(formatTime(article.time))}</time></div>
-        <h3>${esc(article.title)}</h3>
-        <p>${esc(article.summary || t('Consulta la noticia original para conocer todos los detalles.', 'Visit the original story for full details.'))}</p>
-        <a href="${esc(article.url)}" target="_blank" rel="noopener noreferrer">${t('Leer noticia original ↗', 'Read original story ↗')}</a>
+        ${article.image ? `<div class="newsImageWrap"><img class="newsImage" src="${esc(article.image)}" alt="" loading="lazy" referrerpolicy="no-referrer"></div>` : '<div class="newsImageWrap newsImagePlaceholder"><span>◉</span></div>'}
+        <div class="newsCardBody">
+          <div class="newsCardTop"><span class="newsBadge">${esc(article.source)}</span><time datetime="${esc(article.time)}">${esc(formatTime(article.time))}</time></div>
+          <h3>${esc(article.title)}</h3>
+          <p>${esc(article.summary || t('Consulta la noticia original para conocer todos los detalles.', 'Visit the original story for full details.'))}</p>
+          <a href="${esc(article.url)}" target="_blank" rel="noopener noreferrer">${t('Leer noticia original ↗', 'Read original story ↗')}</a>
+        </div>
       </article>
+      ${index === 7 ? adSlot('bottom') : ''}
     `).join('');
   }
 
   async function loadNews() {
     if (loading) return;
     loading = true;
+    warning = '';
     renderArticles();
     try {
       const query = activeTopic === 'all' ? '' : `?topic=${encodeURIComponent(activeTopic)}`;
@@ -109,8 +122,10 @@ import './news.css';
       if (!response.ok) throw new Error('News request failed');
       const data = await response.json();
       articles = Array.isArray(data.articles) ? data.articles : [];
+      warning = typeof data.warning === 'string' ? data.warning : '';
     } catch {
       articles = [];
+      warning = t('No fue posible cargar las noticias. Inténtalo de nuevo.', 'News could not be loaded. Please try again.');
     } finally {
       loading = false;
       renderArticles();
