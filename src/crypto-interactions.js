@@ -1,151 +1,65 @@
-const CRYPTO_MARKETS = {
-  Bitcoin: { symbol: 'BTCUSDT', code: 'BTC', source: 'Binance' },
-  Ethereum: { symbol: 'ETHUSDT', code: 'ETH', source: 'Binance' },
-  Tether: { symbol: 'USDCUSDT', code: 'USDT', source: 'Binance' },
-  Solana: { symbol: 'SOLUSDT', code: 'SOL', source: 'Binance' },
-  BNB: { symbol: 'BNBUSDT', code: 'BNB', source: 'Binance' },
-  XRP: { symbol: 'XRPUSDT', code: 'XRP', source: 'Binance' },
-  Cardano: { symbol: 'ADAUSDT', code: 'ADA', source: 'Binance' },
-  Dogecoin: { symbol: 'DOGEUSDT', code: 'DOGE', source: 'Binance' },
-  Avalanche: { symbol: 'AVAXUSDT', code: 'AVAX', source: 'Binance' },
-  Chainlink: { symbol: 'LINKUSDT', code: 'LINK', source: 'Binance' },
-  Polkadot: { symbol: 'DOTUSDT', code: 'DOT', source: 'Binance' },
-  Polygon: { symbol: 'POLUSDT', code: 'POL', source: 'Binance' }
+const MARKET_ASSETS = {
+  Crypto: {
+    Bitcoin:{symbol:'BTCUSDT',code:'BTC',source:'Binance',provider:'binance'}, Ethereum:{symbol:'ETHUSDT',code:'ETH',source:'Binance',provider:'binance'}, Tether:{symbol:'USDCUSDT',code:'USDT',source:'Binance',provider:'binance'}, Solana:{symbol:'SOLUSDT',code:'SOL',source:'Binance',provider:'binance'}, BNB:{symbol:'BNBUSDT',code:'BNB',source:'Binance',provider:'binance'}, XRP:{symbol:'XRPUSDT',code:'XRP',source:'Binance',provider:'binance'}, Cardano:{symbol:'ADAUSDT',code:'ADA',source:'Binance',provider:'binance'}, Dogecoin:{symbol:'DOGEUSDT',code:'DOGE',source:'Binance',provider:'binance'}, Avalanche:{symbol:'AVAXUSDT',code:'AVAX',source:'Binance',provider:'binance'}, Chainlink:{symbol:'LINKUSDT',code:'LINK',source:'Binance',provider:'binance'}, Polkadot:{symbol:'DOTUSDT',code:'DOT',source:'Binance',provider:'binance'}, Polygon:{symbol:'POLUSDT',code:'POL',source:'Binance',provider:'binance'}
+  },
+  Stock: {
+    Apple:{symbol:'AAPL',code:'AAPL',source:'Yahoo Finance',provider:'yahoo'}, NVIDIA:{symbol:'NVDA',code:'NVDA',source:'Yahoo Finance',provider:'yahoo'}, Microsoft:{symbol:'MSFT',code:'MSFT',source:'Yahoo Finance',provider:'yahoo'}, Amazon:{symbol:'AMZN',code:'AMZN',source:'Yahoo Finance',provider:'yahoo'}, Alphabet:{symbol:'GOOGL',code:'GOOGL',source:'Yahoo Finance',provider:'yahoo'}, Meta:{symbol:'META',code:'META',source:'Yahoo Finance',provider:'yahoo'}, Tesla:{symbol:'TSLA',code:'TSLA',source:'Yahoo Finance',provider:'yahoo'}
+  },
+  Index: {
+    'S&P 500':{symbol:'%5EGSPC',code:'SPX',source:'Yahoo Finance',provider:'yahoo'}, 'Nasdaq 100':{symbol:'%5ENDX',code:'NDX',source:'Yahoo Finance',provider:'yahoo'}, 'Dow Jones':{symbol:'%5EDJI',code:'DJI',source:'Yahoo Finance',provider:'yahoo'}, 'Russell 2000':{symbol:'%5ERUT',code:'RUT',source:'Yahoo Finance',provider:'yahoo'}, DAX:{symbol:'%5EGDAXI',code:'DAX',source:'Yahoo Finance',provider:'yahoo'}, 'FTSE 100':{symbol:'%5EFTSE',code:'FTSE',source:'Yahoo Finance',provider:'yahoo'}, 'Nikkei 225':{symbol:'%5EN225',code:'N225',source:'Yahoo Finance',provider:'yahoo'}, 'IBEX 35':{symbol:'%5EIBEX',code:'IBEX',source:'Yahoo Finance',provider:'yahoo'}
+  },
+  Commodity: {
+    Gold:{symbol:'GC=F',code:'XAU',source:'Yahoo Finance',provider:'yahoo'}, Silver:{symbol:'SI=F',code:'XAG',source:'Yahoo Finance',provider:'yahoo'}, 'WTI Oil':{symbol:'CL=F',code:'WTI',source:'Yahoo Finance',provider:'yahoo'}, 'Brent Oil':{symbol:'BZ=F',code:'BRENT',source:'Yahoo Finance',provider:'yahoo'}, 'Natural Gas':{symbol:'NG=F',code:'NG',source:'Yahoo Finance',provider:'yahoo'}, Copper:{symbol:'HG=F',code:'HG',source:'Yahoo Finance',provider:'yahoo'}, Platinum:{symbol:'PL=F',code:'XPT',source:'Yahoo Finance',provider:'yahoo'}, Corn:{symbol:'ZC=F',code:'ZC',source:'Yahoo Finance',provider:'yahoo'}
+  },
+  Forex: {
+    'EUR/USD':{symbol:'EURUSD=X',code:'EURUSD',source:'Yahoo Finance',provider:'yahoo'}, 'USD/DOP':{symbol:'USDDOP=X',code:'USDDOP',source:'Yahoo Finance',provider:'yahoo'}, 'GBP/USD':{symbol:'GBPUSD=X',code:'GBPUSD',source:'Yahoo Finance',provider:'yahoo'}, 'USD/JPY':{symbol:'JPY=X',code:'USDJPY',source:'Yahoo Finance',provider:'yahoo'}, 'USD/MXN':{symbol:'MXN=X',code:'USDMXN',source:'Yahoo Finance',provider:'yahoo'}, 'USD/CAD':{symbol:'CAD=X',code:'USDCAD',source:'Yahoo Finance',provider:'yahoo'}, 'AUD/USD':{symbol:'AUDUSD=X',code:'AUDUSD',source:'Yahoo Finance',provider:'yahoo'}, 'USD/CHF':{symbol:'CHF=X',code:'USDCHF',source:'Yahoo Finance',provider:'yahoo'}
+  }
 };
 
-const periods = { '30D': 30, '90D': 90, '1Y': 365 };
-let currentPeriod = '30D';
+const PERIODS={ '30D':30, '90D':90, '1Y':365 };
+let marketPeriod='30D';
 
-function cryptoStyles() {
-  if (document.getElementById('cryptoDetailStyles')) return;
-  const style = document.createElement('style');
-  style.id = 'cryptoDetailStyles';
-  style.textContent = `
-    .crypto-clickable{cursor:pointer;position:relative;transition:transform .18s ease,box-shadow .18s ease}
-    .crypto-clickable:hover{transform:translateY(-3px);box-shadow:0 14px 34px rgba(20,40,80,.14)}
-    .crypto-clickable:after{content:'↗';position:absolute;right:18px;top:16px;font-size:17px;opacity:.45}
-    .crypto-modal{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(5,10,22,.62);backdrop-filter:blur(9px)}
-    .crypto-modal.hidden{display:none}
-    .crypto-panel{width:min(980px,100%);max-height:min(90vh,900px);overflow:auto;border:1px solid rgba(120,140,180,.22);border-radius:26px;padding:26px;background:var(--panel,#fff);color:var(--text,#101828);box-shadow:0 30px 90px rgba(0,0,0,.3)}
-    [data-theme="dark"] .crypto-panel{--panel:#111827;--text:#f5f7fb}
-    .crypto-head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px}
-    .crypto-title{display:flex;align-items:center;gap:12px}.crypto-title span{font-size:12px;letter-spacing:.12em;opacity:.58}.crypto-title h2{margin:3px 0 0;font-size:30px}.crypto-price{font-size:30px;font-weight:800;text-align:right}.crypto-change{font-size:14px;margin-top:4px;text-align:right}.crypto-close{width:42px;height:42px;border:0;border-radius:12px;background:rgba(127,145,175,.12);font-size:26px;cursor:pointer}
-    .crypto-periods{display:flex;gap:8px;margin:24px 0 12px}.crypto-period{border:1px solid rgba(127,145,175,.24);background:transparent;border-radius:10px;padding:9px 14px;cursor:pointer;font-weight:700}.crypto-period.active{background:#1849a9;color:#fff;border-color:#1849a9}
-    .crypto-chart{width:100%;height:390px;display:block;border-radius:18px;background:rgba(127,145,175,.055)}
-    .crypto-meta{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:14px;font-size:12px;opacity:.62}.crypto-loading{height:390px;display:flex;align-items:center;justify-content:center;font-weight:700;opacity:.65}.crypto-error{height:390px;display:flex;align-items:center;justify-content:center;text-align:center;padding:30px;opacity:.72}
-    @media(max-width:680px){.crypto-modal{padding:10px}.crypto-panel{padding:18px;border-radius:20px}.crypto-title h2{font-size:24px}.crypto-price{font-size:22px}.crypto-chart{height:300px}.crypto-head{gap:10px}.crypto-close{width:38px;height:38px}}
-  `;
-  document.head.appendChild(style);
+function interactionStyles(){
+  if(document.getElementById('marketInteractionStyles'))return;
+  const s=document.createElement('style');s.id='marketInteractionStyles';s.textContent=`
+    .market-clickable{cursor:pointer;position:relative;transition:transform .18s ease,box-shadow .18s ease}.market-clickable:hover{transform:translateY(-3px);box-shadow:0 14px 34px rgba(20,40,80,.14)}.market-clickable:after{content:'↗';position:absolute;right:18px;top:16px;font-size:17px;opacity:.45}.marketRow.market-clickable:after{right:14px;top:14px}.education article{cursor:pointer;transition:transform .18s ease,box-shadow .18s ease}.education article:hover{transform:translateY(-3px);box-shadow:0 14px 34px rgba(20,40,80,.12)}
+    .market-modal{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(5,10,22,.62);backdrop-filter:blur(9px)}.market-modal.hidden{display:none}.market-panel{width:min(980px,100%);max-height:min(90vh,900px);overflow:auto;border:1px solid rgba(120,140,180,.22);border-radius:26px;padding:26px;background:var(--panel,#fff);color:var(--text,#101828);box-shadow:0 30px 90px rgba(0,0,0,.3)}[data-theme="dark"] .market-panel{--panel:#111827;--text:#f5f7fb}.market-head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px}.market-title h2{margin:3px 0 0;font-size:30px}.market-code{font-size:12px;letter-spacing:.12em;opacity:.58}.market-price{font-size:30px;font-weight:800;text-align:right}.market-change{font-size:14px;margin-top:4px;text-align:right}.market-close{width:42px;height:42px;border:0;border-radius:12px;background:rgba(127,145,175,.12);font-size:26px;cursor:pointer}.market-periods{display:flex;gap:8px;margin:24px 0 12px}.market-period{border:1px solid rgba(127,145,175,.24);background:transparent;border-radius:10px;padding:9px 14px;cursor:pointer;font-weight:700}.market-period.active{background:#1849a9;color:#fff;border-color:#1849a9}.market-chart{width:100%;height:390px;display:block;border-radius:18px;background:rgba(127,145,175,.055)}.market-meta{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:14px;font-size:12px;opacity:.62}.market-loading,.market-error{height:390px;display:flex;align-items:center;justify-content:center;text-align:center;padding:30px;font-weight:700;opacity:.68}.education-modal .market-panel{max-width:820px}.education-body{line-height:1.75}.education-body h3{font-size:24px;margin:8px 0 14px}.education-body p{opacity:.82}.education-body ul{padding-left:22px}.education-tag{display:inline-block;font-size:11px;letter-spacing:.1em;font-weight:800;opacity:.62;margin-bottom:8px}
+    @media(max-width:680px){.market-modal{padding:10px}.market-panel{padding:18px;border-radius:20px}.market-title h2{font-size:24px}.market-price{font-size:22px}.market-chart{height:300px}.market-head{gap:10px}.market-close{width:38px;height:38px}}
+  `;document.head.appendChild(s);
 }
 
-function modalMarkup() {
-  if (document.getElementById('cryptoModal')) return;
-  const modal = document.createElement('div');
-  modal.id = 'cryptoModal';
-  modal.className = 'crypto-modal hidden';
-  modal.innerHTML = `<div class="crypto-panel" role="dialog" aria-modal="true" aria-labelledby="cryptoModalTitle">
-    <div class="crypto-head">
-      <div class="crypto-title"><div><span id="cryptoModalCode">CRYPTO</span><h2 id="cryptoModalTitle">Bitcoin</h2></div></div>
-      <div><button class="crypto-close" id="cryptoModalClose" aria-label="Close">×</button></div>
-    </div>
-    <div class="crypto-head" style="margin-top:10px"><div><span id="cryptoPeriodLabel">Historical market data</span></div><div><div class="crypto-price" id="cryptoModalPrice">—</div><div class="crypto-change" id="cryptoModalChange">—</div></div></div>
-    <div class="crypto-periods">${Object.keys(periods).map(p=>`<button class="crypto-period${p==='30D'?' active':''}" data-period="${p}">${p}</button>`).join('')}</div>
-    <div id="cryptoChartArea" class="crypto-chart"><div class="crypto-loading">Loading historical data…</div></div>
-    <div class="crypto-meta"><span id="cryptoSource">Source: Binance</span><span id="cryptoUpdated">—</span></div>
-  </div>`;
-  document.body.appendChild(modal);
-  document.getElementById('cryptoModalClose').onclick = closeCryptoModal;
-  modal.addEventListener('click', e => { if (e.target === modal) closeCryptoModal(); });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCryptoModal(); });
-  modal.querySelectorAll('.crypto-period').forEach(btn => btn.addEventListener('click', () => {
-    currentPeriod = btn.dataset.period;
-    modal.querySelectorAll('.crypto-period').forEach(x => x.classList.toggle('active', x === btn));
-    const name = document.getElementById('cryptoModalTitle').textContent;
-    loadCryptoHistory(name);
-  }));
+function modalMarkup(){
+  if(document.getElementById('marketModal'))return;
+  const m=document.createElement('div');m.id='marketModal';m.className='market-modal hidden';m.innerHTML=`<div class="market-panel" role="dialog" aria-modal="true" aria-labelledby="marketModalTitle"><div class="market-head"><div class="market-title"><span class="market-code" id="marketModalCode">MARKET</span><h2 id="marketModalTitle">Asset</h2></div><button class="market-close" id="marketModalClose" aria-label="Close">×</button></div><div class="market-head" style="margin-top:10px"><div><span id="marketPeriodLabel">Historical market data</span></div><div><div class="market-price" id="marketModalPrice">—</div><div class="market-change" id="marketModalChange">—</div></div></div><div class="market-periods">${Object.keys(PERIODS).map(p=>`<button class="market-period${p==='30D'?' active':''}" data-period="${p}">${p}</button>`).join('')}</div><div id="marketChartArea" class="market-chart"><div class="market-loading">Loading historical data…</div></div><div class="market-meta"><span id="marketSource">Source: —</span><span id="marketUpdated">—</span></div></div>`;document.body.appendChild(m);
+  document.getElementById('marketModalClose').onclick=closeMarketModal;m.addEventListener('click',e=>{if(e.target===m)closeMarketModal()});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMarketModal()});m.querySelectorAll('.market-period').forEach(b=>b.onclick=()=>{marketPeriod=b.dataset.period;m.querySelectorAll('.market-period').forEach(x=>x.classList.toggle('active',x===b));loadHistory(document.getElementById('marketModalTitle').textContent)});
 }
+function closeMarketModal(){document.getElementById('marketModal')?.classList.add('hidden')}
+function money(v){return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:Math.abs(v)<1?6:2}).format(v)}
+function chart(points,name){const W=900,H=390,P=46,vals=points.map(p=>p[1]),min=Math.min(...vals),max=Math.max(...vals),range=max-min||Math.max(Math.abs(max)*.01,1),x=i=>P+i*((W-P*2)/Math.max(points.length-1,1)),y=v=>H-P-((v-min)/range)*(H-P*2),path=points.map((p,i)=>`${i?'L':'M'}${x(i).toFixed(2)} ${y(p[1]).toFixed(2)}`).join(' '),area=`${path} L${x(points.length-1)} ${H-P} L${x(0)} ${H-P} Z`,grid=[.2,.4,.6,.8].map(r=>`<line x1="${P}" y1="${P+(H-P*2)*r}" x2="${W-P}" y2="${P+(H-P*2)*r}" class="marketGrid"/>`).join(''),labels=[0,Math.floor(points.length/2),points.length-1].map(i=>`<text x="${x(i)}" y="${H-14}" text-anchor="middle" class="marketAxis">${new Date(points[i][0]).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</text>`).join(''),last=vals.at(-1),first=vals[0],change=first?((last-first)/first)*100:0;return{svg:`<svg class="market-chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-label="${name} historical chart"><defs><linearGradient id="marketFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="currentColor" stop-opacity=".18"/><stop offset="100%" stop-color="currentColor" stop-opacity="0"/></linearGradient></defs>${grid}<path d="${area}" fill="url(#marketFill)"/><path d="${path}" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="${x(vals.length-1)}" cy="${y(last)}" r="5" fill="currentColor"/>${labels}</svg>`,last,change}}
 
-function closeCryptoModal() {
-  const modal = document.getElementById('cryptoModal');
-  if (modal) modal.classList.add('hidden');
+async function getPoints(info){const limit=PERIODS[marketPeriod];if(info.provider==='binance'){const r=await fetch(`https://api.binance.com/api/v3/klines?symbol=${info.symbol}&interval=1d&limit=${limit}`,{cache:'no-store'});if(!r.ok)throw Error('unavailable');const rows=await r.json();return rows.map(x=>[Number(x[0]),Number(x[4])])}const range=marketPeriod==='1Y'?'1y':'3mo';const r=await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${info.symbol}?range=${range}&interval=1d&events=history`,{cache:'no-store'});if(!r.ok)throw Error('unavailable');const j=await r.json(),res=j.chart?.result?.[0];if(!res)throw Error('empty');return res.timestamp.map((ts,i)=>[ts*1000,res.indicators.quote[0].close[i]]).filter(x=>Number.isFinite(x[1])).slice(-limit)}
+
+async function loadHistory(name){const info=findAsset(name);const area=document.getElementById('marketChartArea');if(!info||!area)return;area.innerHTML='<div class="market-loading">Loading real historical data…</div>';try{const points=await getPoints(info);if(!points.length)throw Error('empty');const c=chart(points,name);area.innerHTML=c.svg;document.getElementById('marketModalPrice').textContent=info.provider==='binance'?money(c.last):money(c.last);const ce=document.getElementById('marketModalChange');ce.textContent=`${c.change>=0?'+':''}${c.change.toFixed(2)}% ${marketPeriod}`;ce.style.color=c.change>=0?'#15803d':'#b42318';document.getElementById('marketSource').textContent=`Source: ${info.source} · ${info.symbol}`;document.getElementById('marketUpdated').textContent=`Updated: ${new Date().toLocaleString()}`;document.getElementById('marketPeriodLabel').textContent=marketPeriod==='1Y'?'1-year historical data':`${marketPeriod.replace('D','-day')} historical data`;area.style.color=c.change>=0?'#15803d':'#b42318'}catch(e){area.innerHTML='<div class="market-error">No se pudo cargar el histórico en este momento.<br><br>La gráfica utiliza datos históricos reales y depende de la disponibilidad del proveedor.</div>';document.getElementById('marketModalPrice').textContent='—';document.getElementById('marketModalChange').textContent='—'}}
+function findAsset(name){for(const type of Object.keys(MARKET_ASSETS)){if(MARKET_ASSETS[type][name])return MARKET_ASSETS[type][name]}return null}
+function assetType(name){for(const type of Object.keys(MARKET_ASSETS)){if(MARKET_ASSETS[type][name])return type}return null}
+function openMarket(name){interactionStyles();modalMarkup();const info=findAsset(name);if(!info)return;const m=document.getElementById('marketModal');document.getElementById('marketModalTitle').textContent=name;document.getElementById('marketModalCode').textContent=info.code;m.classList.remove('hidden');marketPeriod='30D';m.querySelectorAll('.market-period').forEach(x=>x.classList.toggle('active',x.dataset.period==='30D'));loadHistory(name)}
+
+const EDUCATION={
+  '¿Qué es Bitcoin?':{tag:'CRIPTOMONEDAS',title:'¿Qué es Bitcoin?',body:'Bitcoin es un sistema de dinero digital descentralizado que funciona mediante una red de computadoras y una cadena de bloques. Su diseño permite registrar transferencias sin depender de una autoridad central única.',bullets:['Utiliza tecnología blockchain para registrar transacciones.','Su emisión está definida por las reglas del protocolo.','Su precio puede cambiar significativamente y no representa una garantía de rentabilidad.']},
+  'What is Bitcoin?':{tag:'CRYPTOCURRENCIES',title:'What is Bitcoin?',body:'Bitcoin is a decentralized digital-money system that operates through a network of computers and a blockchain. It records transfers without relying on a single central authority.',bullets:['Uses blockchain technology to record transactions.','Its issuance follows protocol-defined rules.','Its market price can change significantly and does not guarantee returns.']},
+  '¿Qué es la inflación?':{tag:'ECONOMÍA',title:'¿Qué es la inflación?',body:'La inflación es un aumento generalizado y sostenido de los precios de bienes y servicios. Cuando los precios suben, una misma cantidad de dinero normalmente permite comprar menos.',bullets:['Se mide mediante índices de precios.','Puede tener múltiples causas, como demanda, costos o política monetaria.','La inflación no afecta necesariamente a todos los productos por igual.']},
+  'What is inflation?':{tag:'ECONOMICS',title:'What is inflation?',body:'Inflation is a sustained increase in the general price level of goods and services. As prices rise, the same amount of money generally buys less.',bullets:['It is measured through price indexes.','It can have multiple causes, including demand, costs and monetary policy.','Inflation does not affect every product equally.']},
+  '¿Qué es el S&P 500?':{tag:'BOLSA',title:'¿Qué es el S&P 500?',body:'El S&P 500 es un índice que sigue el desempeño de un amplio grupo de grandes empresas cotizadas de Estados Unidos. Se utiliza frecuentemente como referencia del mercado bursátil estadounidense.',bullets:['Es un índice, no una acción individual.','Incluye empresas de distintos sectores.','Su evolución refleja el comportamiento agregado de sus componentes, según la metodología del índice.']},
+  'What is the S&P 500?':{tag:'STOCK MARKET',title:'What is the S&P 500?',body:'The S&P 500 is an index that tracks a broad group of large publicly traded companies in the United States. It is widely used as a reference for the U.S. stock market.',bullets:['It is an index, not an individual stock.','It includes companies from multiple sectors.','Its movement reflects the aggregate performance of its constituents under the index methodology.']},
+  '¿Qué son las acciones?':{tag:'FINANZAS',title:'¿Qué son las acciones?',body:'Una acción representa una participación en la propiedad de una empresa. Las acciones pueden negociarse en mercados públicos y su precio puede subir o bajar según las condiciones del mercado y las expectativas sobre la empresa.',bullets:['Representan una participación de propiedad.','Pueden generar ganancias o pérdidas por cambios de precio.','Algunas empresas pagan dividendos, pero no están garantizados.']},
+  'What are stocks?':{tag:'FINANCE',title:'What are stocks?',body:'A stock represents an ownership interest in a company. Publicly traded shares can rise or fall in price depending on market conditions and expectations about the company.',bullets:['They represent an ownership interest.','Price changes can create gains or losses.','Some companies pay dividends, but dividends are not guaranteed.']}
+};
+function educationModal(){if(document.getElementById('educationModal'))return;const m=document.createElement('div');m.id='educationModal';m.className='market-modal education-modal hidden';m.innerHTML='<div class="market-panel" role="dialog" aria-modal="true"><div class="market-head"><div class="market-title"><span class="market-code" id="eduTag">EDUCATION</span><h2 id="eduTitle">Education</h2></div><button class="market-close" id="eduClose">×</button></div><div class="education-body" id="eduBody"></div></div>';document.body.appendChild(m);document.getElementById('eduClose').onclick=()=>m.classList.add('hidden');m.addEventListener('click',e=>{if(e.target===m)m.classList.add('hidden')})}
+function openEducation(title){const d=EDUCATION[title];if(!d)return;educationModal();document.getElementById('eduTag').textContent=d.tag;document.getElementById('eduTitle').textContent=d.title;document.getElementById('eduBody').innerHTML=`<p>${d.body}</p><ul>${d.bullets.map(x=>`<li>${x}</li>`).join('')}</ul><p><strong>${document.documentElement.lang==='en'?'Educational note:':'Nota educativa:'}</strong> ${document.documentElement.lang==='en'?'This content is informational and is not financial, investment, tax or legal advice.':'Este contenido es informativo y educativo; no constituye asesoramiento financiero, de inversión, fiscal o legal.'}</p>`;document.getElementById('educationModal').classList.remove('hidden')}
+
+function bindInteractions(){
+  interactionStyles();modalMarkup();
+  document.addEventListener('click',e=>{const card=e.target.closest('.card,.marketRow');if(card){const name=card.querySelector('h3,strong')?.textContent?.trim();const type=card.querySelector('span')?.textContent?.trim();if(name&&assetType(name)===type){card.classList.add('market-clickable');openMarket(name);return}}const article=e.target.closest('.education article');if(article){const title=article.querySelector('h3')?.textContent?.trim();if(title&&EDUCATION[title])openEducation(title)}});
+  document.querySelectorAll('.card,.marketRow').forEach(card=>{const name=card.querySelector('h3,strong')?.textContent?.trim();const type=card.querySelector('span')?.textContent?.trim();if(name&&assetType(name)===type)card.classList.add('market-clickable')});
 }
-
-function formatMoney(value) {
-  return new Intl.NumberFormat('en-US', { style:'currency', currency:'USD', maximumFractionDigits:value < 1 ? 6 : 2 }).format(value);
-}
-
-function buildChart(points, name) {
-  const width = 900, height = 390, pad = 46;
-  const values = points.map(p => p[1]);
-  const min = Math.min(...values), max = Math.max(...values);
-  const range = max - min || Math.max(max * .01, 1);
-  const x = i => pad + i * ((width - pad * 2) / Math.max(points.length - 1, 1));
-  const y = v => height - pad - ((v - min) / range) * (height - pad * 2);
-  const path = points.map((p,i)=>`${i?'L':'M'}${x(i).toFixed(2)} ${y(p[1]).toFixed(2)}`).join(' ');
-  const area = `${path} L${x(points.length-1)} ${height-pad} L${x(0)} ${height-pad} Z`;
-  const grid = [0.2,0.4,0.6,0.8].map(r=>{const yy=pad+(height-pad*2)*r;return `<line x1="${pad}" y1="${yy}" x2="${width-pad}" y2="${yy}" class="cryptoGrid"/>`;}).join('');
-  const labels = [0, Math.floor(points.length/2), points.length-1].map(i=>`<text x="${x(i)}" y="${height-14}" text-anchor="middle" class="cryptoAxis">${new Date(points[i][0]).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</text>`).join('');
-  const last = values[values.length-1], first = values[0], change = first ? ((last-first)/first)*100 : 0;
-  const colorClass = change >= 0 ? 'cryptoUp' : 'cryptoDown';
-  return { svg:`<svg class="crypto-chart" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" aria-label="${name} historical chart"><defs><linearGradient id="cryptoFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="currentColor" stop-opacity=".18"/><stop offset="100%" stop-color="currentColor" stop-opacity="0"/></linearGradient></defs>${grid}<path d="${area}" fill="url(#cryptoFill)"/><path d="${path}" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="${x(points.length-1)}" cy="${y(last)}" r="5" fill="currentColor"/>${labels}</svg>`, last, change, colorClass };
-}
-
-async function loadCryptoHistory(name) {
-  const info = CRYPTO_MARKETS[name];
-  const area = document.getElementById('cryptoChartArea');
-  if (!info || !area) return;
-  area.innerHTML = '<div class="crypto-loading">Loading real historical data…</div>';
-  try {
-    const limit = periods[currentPeriod];
-    const url = `https://api.binance.com/api/v3/klines?symbol=${info.symbol}&interval=1d&limit=${limit}`;
-    const response = await fetch(url, { cache:'no-store' });
-    if (!response.ok) throw new Error('Market data unavailable');
-    const rows = await response.json();
-    const points = rows.map(r => [Number(r[0]), Number(r[4])]);
-    if (!points.length) throw new Error('No historical data');
-    const chart = buildChart(points, name);
-    area.innerHTML = chart.svg;
-    const price = chart.last;
-    const change = chart.change;
-    document.getElementById('cryptoModalPrice').textContent = formatMoney(price);
-    const changeEl = document.getElementById('cryptoModalChange');
-    changeEl.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)}% ${currentPeriod}`;
-    changeEl.style.color = change >= 0 ? '#15803d' : '#b42318';
-    document.getElementById('cryptoSource').textContent = `Source: ${info.source} · ${info.symbol}`;
-    document.getElementById('cryptoUpdated').textContent = `Updated: ${new Date().toLocaleString()}`;
-    document.getElementById('cryptoPeriodLabel').textContent = currentPeriod === '1Y' ? '1-year historical data' : `${currentPeriod.replace('D','-day')} historical data`;
-    area.style.color = change >= 0 ? '#15803d' : '#b42318';
-  } catch (error) {
-    area.innerHTML = '<div class="crypto-error">No se pudo cargar el histórico en este momento.<br><br>La gráfica utiliza datos históricos reales de mercado y depende de la disponibilidad del proveedor.</div>';
-    document.getElementById('cryptoModalPrice').textContent = '—';
-    document.getElementById('cryptoModalChange').textContent = '—';
-  }
-}
-
-function openCryptoModal(name) {
-  cryptoStyles();
-  modalMarkup();
-  const info = CRYPTO_MARKETS[name];
-  if (!info) return;
-  const modal = document.getElementById('cryptoModal');
-  document.getElementById('cryptoModalTitle').textContent = name;
-  document.getElementById('cryptoModalCode').textContent = info.code;
-  modal.classList.remove('hidden');
-  currentPeriod = '30D';
-  modal.querySelectorAll('.crypto-period').forEach(x=>x.classList.toggle('active',x.dataset.period===currentPeriod));
-  loadCryptoHistory(name);
-}
-
-function bindCryptoCards() {
-  document.addEventListener('click', event => {
-    const card = event.target.closest('.card');
-    if (!card) return;
-    const category = card.querySelector('span')?.textContent?.trim();
-    const name = card.querySelector('h3')?.textContent?.trim();
-    if (category === 'Crypto' && CRYPTO_MARKETS[name]) openCryptoModal(name);
-  });
-}
-
-cryptoStyles();
-modalMarkup();
-bindCryptoCards();
+interactionStyles();modalMarkup();educationModal();bindInteractions();
