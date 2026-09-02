@@ -1,16 +1,16 @@
 const ASSETS = {
-  Bitcoin: { provider: 'binance', symbol: 'BTCUSDT' },
-  Ethereum: { provider: 'binance', symbol: 'ETHUSDT' },
-  Tether: { provider: 'binance', symbol: 'USDCUSDT' },
-  Solana: { provider: 'binance', symbol: 'SOLUSDT' },
-  BNB: { provider: 'binance', symbol: 'BNBUSDT' },
-  XRP: { provider: 'binance', symbol: 'XRPUSDT' },
-  Cardano: { provider: 'binance', symbol: 'ADAUSDT' },
-  Dogecoin: { provider: 'binance', symbol: 'DOGEUSDT' },
-  Avalanche: { provider: 'binance', symbol: 'AVAXUSDT' },
-  Chainlink: { provider: 'binance', symbol: 'LINKUSDT' },
-  Polkadot: { provider: 'binance', symbol: 'DOTUSDT' },
-  Polygon: { provider: 'binance', symbol: 'POLUSDT' },
+  Bitcoin: { provider: 'crypto', symbol: 'BTCUSDT', coinbase: 'BTC-USD' },
+  Ethereum: { provider: 'crypto', symbol: 'ETHUSDT', coinbase: 'ETH-USD' },
+  Tether: { provider: 'crypto', symbol: 'USDTUSDT', coinbase: 'USDT-USD' },
+  Solana: { provider: 'crypto', symbol: 'SOLUSDT', coinbase: 'SOL-USD' },
+  BNB: { provider: 'crypto', symbol: 'BNBUSDT', coinbase: 'BNB-USD' },
+  XRP: { provider: 'crypto', symbol: 'XRPUSDT', coinbase: 'XRP-USD' },
+  Cardano: { provider: 'crypto', symbol: 'ADAUSDT', coinbase: 'ADA-USD' },
+  Dogecoin: { provider: 'crypto', symbol: 'DOGEUSDT', coinbase: 'DOGE-USD' },
+  Avalanche: { provider: 'crypto', symbol: 'AVAXUSDT', coinbase: 'AVAX-USD' },
+  Chainlink: { provider: 'crypto', symbol: 'LINKUSDT', coinbase: 'LINK-USD' },
+  Polkadot: { provider: 'crypto', symbol: 'DOTUSDT', coinbase: 'DOT-USD' },
+  Polygon: { provider: 'crypto', symbol: 'POLUSDT', coinbase: 'POL-USD' },
   Apple: { provider: 'yahoo', symbol: 'AAPL' },
   NVIDIA: { provider: 'yahoo', symbol: 'NVDA' },
   Microsoft: { provider: 'yahoo', symbol: 'MSFT' },
@@ -52,20 +52,45 @@ function invertPoints(points) {
   });
 }
 
+async function getCryptoBinance(info, period) {
+  const limit = period === '1Y' ? 365 : period === '90D' ? 90 : 30;
+  const interval = period === '1Y' ? '1d' : '1h';
+  const requestLimit = period === '1Y' ? limit : Math.min(limit * 24, 1000);
+  const response = await fetch('https://api.binance.com/api/v3/klines?symbol=' + info.symbol + '&interval=' + interval + '&limit=' + requestLimit);
+  if (!response.ok) throw new Error('Binance unavailable');
+  const rows = await response.json();
+  const points = rows.map(function (row) { return [Number(row[0]), Number(row[4])]; }).filter(function (point) { return Number.isFinite(point[1]); });
+  if (!points.length) throw new Error('Empty Binance history');
+  return points;
+}
+
+async function getCryptoCoinbase(info, period) {
+  const days = period === '1Y' ? 365 : period === '90D' ? 90 : 30;
+  const granularity = 86400;
+  const end = Math.floor(Date.now() / 1000);
+  const start = end - days * 86400;
+  const response = await fetch('https://api.exchange.coinbase.com/products/' + encodeURIComponent(info.coinbase) + '/candles?granularity=' + granularity + '&start=' + start + '&end=' + end, { headers: { Accept: 'application/json' } });
+  if (!response.ok) throw new Error('Coinbase unavailable');
+  const rows = await response.json();
+  const points = rows.map(function (row) { return [Number(row[0]) * 1000, Number(row[4])]; }).filter(function (point) { return Number.isFinite(point[1]); }).sort(function (a,b) { return a[0] - b[0]; });
+  if (!points.length) throw new Error('Empty Coinbase history');
+  return points;
+}
+
+async function getCryptoPoints(info, period) {
+  try {
+    return { points: await getCryptoBinance(info, period), source: 'Binance' };
+  } catch (binanceError) {
+    return { points: await getCryptoCoinbase(info, period), source: 'Coinbase' };
+  }
+}
+
 async function getPoints(name, period) {
   const info = ASSETS[name];
   if (!info) throw new Error('Unknown asset');
 
-  if (info.provider === 'binance') {
-    const limit = period === '1Y' ? 365 : period === '90D' ? 90 : 30;
-    const interval = period === '1Y' ? '1d' : '1h';
-    const requestLimit = period === '1Y' ? limit : Math.min(limit * 24, 1000);
-    const response = await fetch('https://api.binance.com/api/v3/klines?symbol=' + info.symbol + '&interval=' + interval + '&limit=' + requestLimit);
-    if (!response.ok) throw new Error('Binance unavailable');
-    const rows = await response.json();
-    return rows.map(function (row) {
-      return [Number(row[0]), Number(row[4])];
-    });
+  if (info.provider === 'crypto') {
+    return (await getCryptoPoints(info, period)).points;
   }
 
   const range = period === '1Y' ? '1y' : period === '90D' ? '3mo' : '1mo';
@@ -87,6 +112,12 @@ async function getPoints(name, period) {
   return points.slice(-maximum);
 }
 
+async function getSource(name, period) {
+  const info = ASSETS[name];
+  if (info.provider === 'crypto') return (await getCryptoPoints(info, period)).source;
+  return 'Yahoo Finance';
+}
+
 async function quote(name) {
   const points = await getPoints(name, '30D');
   if (!points.length) throw new Error('Empty history');
@@ -97,7 +128,7 @@ async function quote(name) {
     price: last,
     change: previous ? ((last - previous) / previous) * 100 : 0,
     updated: points[points.length - 1][0],
-    source: ASSETS[name].provider === 'binance' ? 'Binance' : 'Yahoo Finance'
+    source: await getSource(name, '30D')
   };
 }
 
@@ -120,7 +151,7 @@ module.exports = async function handler(req, res) {
         price: last,
         change: first ? ((last - first) / first) * 100 : 0,
         updated: points[points.length - 1][0],
-        source: ASSETS[asset].provider === 'binance' ? 'Binance' : 'Yahoo Finance'
+        source: await getSource(asset, period)
       });
     }
 
