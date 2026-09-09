@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://eudexa-virid.vercel.app/sitemap.xml
+Sitemap: https://eudexa.vercel.app/sitemap.xml
