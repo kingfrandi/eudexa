@@ -188,7 +188,7 @@ function enhanceCurrencyConverter() {
       return;
     }
     const converted = value / demoRates[f] * demoRates[t];
-    result.textContent = `${new Intl.NumberFormat(undefined,{maximumFractionDigits:2}).format(converted)} ${t}`;
+    result.textContent = `${new Intl.NumberFormat('en-US',{minimumFractionDigits:2,maximumFractionDigits:2,useGrouping:true}).format(converted)} ${t}`;
     result.title = '';
   };
 
