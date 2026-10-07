@@ -58,7 +58,7 @@ function updateLiveConverter() {
   // All rates share USD as their base, so any pair can be calculated directly:
   // amount × (USD→target) ÷ (USD→source).
   const converted = value * (fxRates[t] / fxRates[f]);
-  result.textContent = `${new Intl.NumberFormat('en-US', { maximumFractionDigits: 6 }).format(converted)} ${t}`;
+  result.textContent = `${new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(converted)} ${t}`;
   result.title = fxUpdatedAt ? `Tasa en vivo. Fuente actualizada: ${fxUpdatedAt}` : 'Tasa en vivo';
 }
 
